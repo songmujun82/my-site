@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>生日专属财富祝福 - 每日运程</title>
+  <style>
+    body {
+      background: radial-gradient(ellipse at center, #1a1a40 0%, #000010 100%);
+      color: #f0e6ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #ffd700;
+      text-shadow: 0 0 12px #ffd700;
+      margin-bottom: 20px;
+    }
+    .input-area {
+      background: rgba(255,255,255,0.05);
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+      max-width: 400px;
+      width: 100%;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #ffcc88;
+    }
+    input[type="date"] {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
+      text-align: center;
+    }
+    button {
+      margin-top: 18px;
+      background: #ffd700;
+      border: none;
+      padding: 12px 30px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      color: #1a1a40;
+      box-shadow: 0 0 10px #ffd700;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ffb800;
+    }
+    .result-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(255,255,255,0.15);
+      text-align: center;
+      user-select: none;
+    }
+    .label {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #ffcc88;
+      margin-bottom: 8px;
+    }
+    .value {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #ffffff;
+      text-shadow: 0 0 10px #ffd700;
+    }
+    .color-box {
+      display: inline-block;
+      width: 45px;
+      height: 45px;
+      border-radius: 10px;
+      border: 2px solid #fff;
+      vertical-align: middle;
+      margin-left: 12px;
+      box-shadow: 0 0 8px #ffd700;
+    }
+    .blessing-text {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      font-style: italic;
+      color: #ffd;
+      text-shadow: 0 0 6px #ffb800;
+      user-select: text;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #666;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>生日专属财富祝福仪式</h1>
+  <div class="input-area">
+    <label for="birthday">请输入您的生日：</label><br/>
+    <input type="date" id="birthday" max="" /><br/>
+    <button onclick="generateBlessing()">生成今日运程</button>
+  </div>
+  <div id="result" class="result-card" style="display:none;">
+    <div class="label">您的幸运数字：</div>
+    <div id="luckyNumber" class="value">--</div>
+
+    <div class="label">今日幸运颜色：</div>
+    <div class="value">
+      <span id="luckyColorName">--</span>
+      <span id="colorBox" class="color-box"></span>
+    </div>
+
+    <div class="label">专属祝福语：</div>
+    <div id="blessing" class="blessing-text">--</div>
+  </div>
+
+  <footer>愿宇宙之力永远伴随你 | Aetheros NFT 祷文系统</footer>
+
+  <script>
+    // 99条祝福语
+    const blessings = [
+      "财富如潮水，绵延不绝。",
+      "你的钱包将装满宇宙之金。",
+      "金钱将因你的心愿而舞动。",
+      "今天的你，正是丰收的容器。",
+      "每个念头都种下黄金种子。",
+      "你的价值正被世界看见。",
+      "无限宇宙的财富向你聚集。",
+      "你是幸运之星，财富因你而生。",
+      "你正走在通往金光大道的路上。",
+      "你所触碰的皆化为宝藏。",
+      "你为世界带来财富，财富也回馈你。",
+      "每一次呼吸都充满吸金能量。",
+      "你值得拥有丰盛的一切。",
+      "你的财运如星光般灿烂。",
+      "幸运之门今日已为你打开。",
+      "宇宙的黄金雨正洒向你。",
+      "一切资源正悄然靠近。",
+      "你拥有点石成金的魔力。",
+      "财富正在寻找你，并与你共舞。",
+      "今天是金色奇迹的开始。",
+      "金钱流动自如，因为你值得。",
+      "神圣祝福加持你的钱包。",
+      "你的频率吸引无限可能。",
+      "万物为你所动，财富为你所拥。",
+      "你与宇宙财富连接无阻。",
+      "你就是财富本身的显化。",
+      "你正处于丰收的黄金时期。",
+      "宇宙账本已为你写下丰盛。",
+      "今日你将收到意外之财。",
+      "你心中所愿，金钱立现。",
+      "所有金钱恐惧将转化为力量。",
+      "你的名字被财富铭记。",
+      "你已觉醒为吸金体质。",
+      "你所散发的光吸引丰盛回响。",
+      "你正成为财运之神的化身。",
+      "每一个想法都能转化为价值。",
+      "今日，你的能量值达巅峰。",
+      "你值得拥有金色未来。",
+      "你正踏上通往宝藏的路径。",
+      "你是金光中诞生的幸运者。",
+      "一切正好，万事俱丰。",
+      "今日之星，属你最亮。",
+      "你的心跳是吸金节奏。",
+      "财富密码已刻入你灵魂。",
+      "今天的你，连空气都带财味。",
+      "你已经在幸运频率中。",
+      "财富守护灵今日驻你身侧。",
+      "你是繁荣之门的守护者。",
+      "一切都会比想象中更丰盛。",
+      "灵感+行动=今日的财富奇迹。",
+      "愿你如光，如金，如风。",
+      "万物皆可变现，尤其是你。",
+      "你是一束能点亮金矿的光。",
+      "天赋正被赏识，财富正涌入。",
+      "你值得一切美好报偿。",
+      "收获期已至，请安心享受。",
+      "你已经种下幸运循环。",
+      "你的祷文正在被宇宙应答。",
+      "你是繁星中最贵的那一颗。",
+      "金色世界向你敞开大门。",
+      "你将与奇迹同行。",
+      "财富之神向你献上祝福。",
+      "今日财运如星辰闪耀。",
+      "愿财富伴你如影随形。",
+      "幸运女神对你微笑。",
+      "财富大道已为你铺就。",
+      "你是吸金磁铁，无可阻挡。",
+      "财富的浪潮将托起你。",
+      "你心怀黄金，黄金回报你。",
+      "愿你收获丰盛的果实。",
+      "金钱流动如溪水般顺畅。",
+      "你是宇宙财富的宠儿。",
+      "财神爷今日特意眷顾你。",
+      "财富能量在你体内流动。",
+      "你将迎来财富的春天。",
+      "好运与财富同在。",
+      "你是财富之门的钥匙。",
+      "所有金钱都将被你吸引。",
+      "财富星辰正在为你闪耀。",
+      "你就是黄金时代的象征。",
+      "灵性与财富完美结合。",
+      "今天是富饶之日。",
+      "你会遇到转变人生的财富机会。",
+      "祝你金银满仓，财源滚滚。",
+      "你散发出的光芒吸引财富。",
+      "愿你被金色光环包围。",
+      "财富花园为你盛开。",
+      "今日你是黄金的化身。",
+      "你正站在幸运的巅峰。",
+      "财富的洪流正向你奔涌。",
+      "你心中充满金色的祝福。",
+      "所有财富向你汇聚。",
+      "你拥有开启财富宝盒的钥匙。",
+      "愿你步步生金。",
+      "财富与幸福永远相伴。",
+      "你的祝福传递无穷能量。",
+      "你是黄金星座中的璀璨星辰。",
+      "财富祈愿已被宇宙铭记。",
+      "你拥有无尽的财富可能。",
+      "每一个决定都是财富的源泉。",
+      "你的好运正在发光。",
+      "愿你财源广进，生活富足。",
+      "财富之路铺满光辉。",
+      "你是宇宙赐予的富贵之人。"
+    ];
+
+    // 99个幸运颜色及名字（简化版）
+    const colors = [
+      {name:"金色",hex:"#FFD700"},
+      {name:"紫罗兰",hex:"#8A2BE2"},
+      {name:"翡翠绿",hex:"#50C878"},
+      {name:"珊瑚红",hex:"#FF7F50"},
+      {name:"深蓝",hex:"#003366"},
+      {name:"玫瑰红",hex:"#FF007F"},
+      {name:"碧绿色",hex:"#00CED1"},
+      {name:"琥珀色",hex:"#FFBF00"},
+      {name:"银灰色",hex:"#C0C0C0"},
+      {name:"琉璃蓝",hex:"#1E90FF"},
+      {name:"蜜桃色",hex:"#FFDAB9"},
+      {name:"橄榄绿",hex:"#808000"},
+      {name:"樱花粉",hex:"#FFB7C5"},
+      {name:"橙黄",hex:"#FFA500"},
+      {name:"青色",hex:"#00FFFF"},
+      {name:"烟灰色",hex:"#708090"},
+      {name:"宝蓝",hex:"#0033CC"},
+      {name:"柠檬黄",hex:"#FFF44F"},
+      {name:"紫水晶",hex:"#9966CC"},
+      {name:"桃红",hex:"#FF1493"},
+      {name:"藏蓝",hex:"#003153"},
+      {name:"茶色",hex:"#D0F0C0"},
+      {name:"粉蓝",hex:"#AEC6CF"},
+      {name:"浅黄",hex:"#FFFFE0"},
+      {name:"铜色",hex:"#B87333"},
+      {name:"草绿",hex:"#7CFC00"},
+      {name:"浅紫",hex:"#D8BFD8"},
+      {name:"红宝石",hex:"#9B111E"},
+      {name:"烟白",hex:"#F5F5F5"},
+      {name:"青铜",hex:"#CD7F32"},
+      {name:"天空蓝",hex:"#87CEEB"},
+      {name:"石灰绿",hex:"#32CD32"},
+      {name:"茜红",hex:"#E32636"},
+      {name:"金合欢黄",hex:"#FFDEAD"},
+      {name:"祖母绿",hex:"#50C878"},
+      {name:"粉橘",hex:"#FFDAB9"},
+      {name:"橙红",hex:"#FF4500"},
+      {name:"墨绿色",hex:"#004225"},
+      {name:"丁香紫",hex:"#DA70D6"},
+      {name:"雾灰",hex:"#BEBEBE"},
+      {name:"宝石蓝",hex:"#1560BD"},
+      {name:"蜜蜡黄",hex:"#FFB300"},
+      {name:"茶褐",hex:"#D2B48C"},
+      {name:"樱草黄",hex:"#FFF700"},
+      {name:"玛瑙红",hex:"#B7410E"},
+      {name:"薰衣草紫",hex:"#E6E6FA"},
+      {name:"海蓝",hex:"#4682B4"},
+      {name:"松绿",hex:"#2E8B57"},
+      {name:"铁锈红",hex:"#B22222"},
+      {name:"乳白",hex:"#FFFFF0"},
+      {name:"棕色",hex:"#A52A2A"},
+      {name:"海棠红",hex:"#FF6347"},
+      {name:"孔雀蓝",hex:"#1CA9C9"},
+      {name:"淡粉",hex:"#FFB6C1"},
+      {name:"灰蓝",hex:"#6699CC"},
+      {name:"玳瑁黄",hex:"#FFC87C"},
+      {name:"海蓝宝石",hex:"#7FFFD4"},
+      {name:"绛紫",hex:"#800080"},
+      {name:"银白",hex:"#E6E8FA"},
+      {name:"橘黄",hex:"#FFA07A"},
+      {name:"碧蓝",hex:"#007BA7"},
+      {name:"柿红",hex:"#EE7942"},
+      {name:"浅绿",hex:"#90EE90"},
+      {name:"玛瑙蓝",hex:"#003399"},
+      {name:"烟粉",hex:"#FFDDEE"},
+      {name:"金丝雀黄",hex:"#FFEF00"},
+      {name:"琥珀橙",hex:"#FF7E00"},
+      {name:"珍珠白",hex:"#FDEEF4"},
+      {name:"深紫",hex:"#4B0082"},
+      {name:"浅橙",hex:"#FFA07A"},
+      {name:"薄荷绿",hex:"#98FF98"},
+      {name:"火山红",hex:"#FF4500"},
+      {name:"冰蓝",hex:"#AFDBF5"},
+      {name:"橙红",hex:"#FF5722"},
+      {name:"青草绿",hex:"#7FFF00"},
+      {name:"桃红",hex:"#FF69B4"},
+      {name:"淡紫",hex:"#DDA0DD"},
+      {name:"天空灰",hex:"#778899"},
+      {name:"银蓝",hex:"#6699CC"},
+      {name:"藏青",hex:"#003366"},
+      {name:"鹅黄色",hex:"#FFFACD"},
+      {name:"橘粉",hex:"#FF9966"},
+      {name:"浅灰",hex:"#D3D3D3"},
+      {name:"紫红",hex:"#C71585"},
+      {name:"翡翠绿",hex:"#50C878"},
+      {name:"淡黄",hex:"#FFFFE0"},
+      {name:"亮蓝",hex:"#3399FF"},
+      {name:"棕褐",hex:"#A0522D"},
+      {name:"石灰",hex:"#32CD32"},
+      {name:"朱红",hex:"#FF2400"},
+      {name:"淡蓝",hex:"#ADD8E6"},
+      {name:"浅棕",hex:"#D2B48C"},
+      {name:"雪白",hex:"#FFFAFA"}
+    ];
+
+    // 简单hash函数（将字符串转为数字）
+    function simpleHash(str) {
+      let hash = 0;
+      for(let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0; // 转为32位整数
+      }
+      return Math.abs(hash);
+    }
+
+    function getTodayString() {
+      const d = new Date();
+      return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+    }
+
+    // 生日格式 "yyyy-mm-dd"
+    function generateBlessing() {
+      const birthday = document.getElementById('birthday').value;
+      if (!birthday) {
+        alert("请先输入生日");
+        return;
+      }
+
+      // 拼接生日+今日日期
+      const keyStr = birthday + "_" + getTodayString();
+      const hashValue = simpleHash(keyStr);
+
+      // 幸运数字1-99
+      const luckyNumber = (hashValue % 99) + 1;
+
+      // 祝福语索引 0-98
+      const blessingIndex = hashValue % blessings.length;
+
+      // 幸运颜色索引 0-98
+      const colorIndex = hashValue % colors.length;
+
+      // 赋值显示
+      document.getElementById('luckyNumber').textContent = luckyNumber;
+      document.getElementById('blessing').textContent = blessings[blessingIndex];
+      document.getElementById('luckyColorName').textContent = colors[colorIndex].name;
+      const colorBox = document.getElementById('colorBox');
+      colorBox.style.backgroundColor = colors[colorIndex].hex;
+
+      // 显示结果区
+      document.getElementById('result').style.display = "block";
+    }
+
+    // 设置最大日期为今天，避免未来日期
+    const inputDate = document.getElementById('birthday');
+    const today = new Date().toISOString().split("T")[0];
+    inputDate.setAttribute("max", today);
+  </script>
+</body>
+</html>
